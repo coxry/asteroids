@@ -53,9 +53,9 @@
 	// Called after the HTML body loads
 	function init() {
 		loadAsteroidImages(1);
-        	canvas = document.getElementById("gameScreen");
+		canvas = document.getElementById("gameScreen");
 		ctx = canvas.getContext("2d");
-     		initLevel();
+		initLevel();
 		window.addEventListener("resize",setupCanvas,false);
 		document.addEventListener("keydown", keyDown, false);
 		document.addEventListener("keyup", keyUp, false);
@@ -65,7 +65,7 @@
 	function loadAsteroidImages(num) {
 		if (num <= 4) {
 			asteroidImg[num] = new Image();
-			asteroidImg[num].src = "images/asteroid"+num+".png";
+			asteroidImg[num].src = "./images/asteroid"+num+".png";
 			asteroidImg[num].onload = loadAsteroidImages(num+1);
 		}
 	}
@@ -81,19 +81,19 @@
 	}
 	
 	function shipCrashed() {
-     	initLevel();
+	initLevel();
 	}
 	
     function setupCanvas() {
 		// TODO replace with modernizr, show error on else
 		if( ctx != null ) {
-      		canvas.width = window.innerWidth;
-      		canvas.height = window.innerHeight;
-      	} else {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	} else {
 			document.write("Unable to setup canvas.. Are you using IE?");
 		}
      }
-  	
+	
 	function mainLoop() {
 		var nowTime = new Date();
 		var diffTime = Math.ceil((nowTime.getTime() - lastTime.getTime()));
@@ -111,8 +111,8 @@
 		animateMissles();
 		animateAsteroids();
 		drawScore();
-		drawFPS();
-		          
+		//drawFPS();
+			  
           // Sets the speed, position and existance of user controlled entities
          checkKeys();
 		 frameCount++;
@@ -136,7 +136,7 @@
 	}
 	
 	function handleKey(keyCode, down) {
-     	switch(keyCode) {
+	switch(keyCode) {
 			// left
 			case 37:
 				leftKey=down;
@@ -166,11 +166,11 @@
 	}
 	
 	function keyDown(evt) {
-     	handleKey(evt.keyCode,true);
+	handleKey(evt.keyCode,true);
 	}
 	
 	function keyUp(evt) {
-     	handleKey(evt.keyCode,false);
+	handleKey(evt.keyCode,false);
 	}
 	
 	function accelerateShip() {
@@ -190,7 +190,7 @@
 		var newX = ship.position.x + ship.speed.x;
 		var newY = ship.position.y + ship.speed.y;
 		
-     	if (newX > canvas.width) {
+	if (newX > canvas.width) {
 			newX = 0;
 		} else if (newX < 0) {
 			newX = canvas.width;
@@ -318,7 +318,7 @@
 	}
 	
 	function drawMissle(missle) {
-      		ctx.save();
+		ctx.save();
 			ctx.translate(missle.position.x, missle.position.y);
 			ctx.beginPath();
 			ctx.arc(0,0,missle.radius,0,Math.PI*2,true);
@@ -385,11 +385,11 @@
 	}
 	
 	function drawScore() {
-     	ctx.font = "bold 12px sans-serif"; 
-     	ctx.textBaseline = "top";
-     	ctx.textAlign  = "right";
-     	ctx.fillStyle = "white";
-     	ctx.fillText("Score:  "+score, canvas.width-5, 5); 
+	ctx.font = "bold 12px sans-serif"; 
+	ctx.textBaseline = "top";
+	ctx.textAlign  = "right";
+	ctx.fillStyle = "white";
+	ctx.fillText("Score:  "+score, canvas.width-5, 5); 
      }
      
      function randomHexColor() {
