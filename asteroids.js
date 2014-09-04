@@ -14,26 +14,12 @@
         };
       }).promise();
     };
-    $.loadImages = function(arr) {
-      return $.Deferred(function(deferred) {
-        var images, url, _i, _len, _results;
-        images = [];
-        _results = [];
-        for (_i = 0, _len = arr.length; _i < _len; _i++) {
-          url = arr[_i];
-          _results.push($.loadImage(url).then(function(image) {
-            images.push(image);
-            if (images.length === arr.length) {
-              return deferred.resolve(images);
-            }
-          }).fail(function(err) {
-            return deferred.reject(err);
-          }));
-        }
-        return _results;
-      }).promise();
+    $.whenall = function(arr) {
+      return $.when.apply($, arr).then(function() {
+        return Array.prototype.slice.call(arguments);
+      });
     };
-    return $.loadImages(['./images/asteroid1.png', './images/asteroid2.png', './images/asteroid3.png']).then(function(images) {
+    return $.whenall([$.loadImage('./images/asteroid1.png'), $.loadImage('./images/asteroid2.png'), $.loadImage('./images/asteroid3.png')]).done(function(images) {
       var canvas, ctx;
       canvas = $('#gameScreen')[0];
       ctx = canvas.getContext('2d');

@@ -9,24 +9,16 @@ $(->
         deferred.reject("Unable to load #{url}")
     ).promise()
 
-  $.loadImages = (arr) ->
-    $.Deferred((deferred) ->
-      images = []
-      for url in arr
-        $.loadImage(url).then((image) ->
-          images.push(image)
-          if images.length == arr.length
-            deferred.resolve(images)
-        ).fail((err) ->
-          deferred.reject(err)
-        )
-    ).promise()
+  $.whenall = (arr) ->
+    $.when.apply($, arr).then(->
+      Array.prototype.slice.call(arguments)
+    )
 
-  $.loadImages([
-    './images/asteroid1.png',
-    './images/asteroid2.png',
-    './images/asteroid3.png'
-  ]).then((images) ->
+  $.whenall([
+    $.loadImage('./images/asteroid1.png'),
+    $.loadImage('./images/asteroid2.png'),
+    $.loadImage('./images/asteroid3.png')
+  ]).done((images) ->
     canvas = $('#gameScreen')[0]
     ctx = canvas.getContext('2d')
     setInterval((->
