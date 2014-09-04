@@ -17,8 +17,10 @@ $(->
   $.whenall([
     $.loadImage('./images/asteroid1.png'),
     $.loadImage('./images/asteroid2.png'),
-    $.loadImage('./images/asteroid3.png')
+    $.loadImage('./images/asteroid3.png'),
+    $.loadImage('./images/asteroid4.png')
   ]).done((images) ->
+    console.debug images
     canvas = $('#gameScreen')[0]
     ctx = canvas.getContext('2d')
     setInterval((->
@@ -31,6 +33,6 @@ $(->
         i++
     ),1000)
   ).fail((err) ->
-    console.debug err
+    console.error err
   )
 )

@@ -19,8 +19,9 @@
         return Array.prototype.slice.call(arguments);
       });
     };
-    return $.whenall([$.loadImage('./images/asteroid1.png'), $.loadImage('./images/asteroid2.png'), $.loadImage('./images/asteroid3.png')]).done(function(images) {
+    return $.whenall([$.loadImage('./images/asteroid1.png'), $.loadImage('./images/asteroid2.png'), $.loadImage('./images/asteroid3.png'), $.loadImage('./images/asteroid4.png')]).done(function(images) {
       var canvas, ctx;
+      console.debug(images);
       canvas = $('#gameScreen')[0];
       ctx = canvas.getContext('2d');
       return setInterval((function() {
@@ -38,7 +39,7 @@
         return _results;
       }), 1000);
     }).fail(function(err) {
-      return console.debug(err);
+      return console.error(err);
     });
   });
 
