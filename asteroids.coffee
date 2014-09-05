@@ -64,6 +64,16 @@ $(->
         image.onerror = null
     )
 
+  canvas = $('#gameScreen')[0]
+  ctx = canvas.getContext('2d')
+
+  window.onresize = -> resizeCanvas()
+
+  resizeCanvas = ->
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
@@ -72,9 +82,9 @@ $(->
     loadImage('./images/asteroid3.png'),
     loadImage('./images/asteroid4.png')
   ]).then((images) ->
+
+    resizeCanvas()
     # Setup some useful variables
-    canvas = $('#gameScreen')[0]
-    ctx = canvas.getContext('2d')
     ship = new Ship(window.innerWidth / 2, window.innerHeight / 2)
     asteroids = [1..100].map((i) ->
       new Asteroid(images[i % 4],
@@ -86,12 +96,10 @@ $(->
 
     # Game loop!
     setInterval(->
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       for entity in entities
         entity.draw(ctx)
-        entity.tick(window.innerWidth, window.innerHeight)
+        entity.tick(canvas.width, canvas.height)
     ,10)
   ,(err) ->
     console.error(err)
