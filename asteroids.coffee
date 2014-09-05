@@ -1,5 +1,4 @@
-$ ->
-
+$(->
   class Entity
     velX: 0
     velY: 0
@@ -9,18 +8,16 @@ $ ->
     tick: (maxWidth, maxHeight) ->
       @x += @velX
       @y += @velY
-      if @x > maxWidth then @x = -@width/2
-      if @x < -@width/2 then @x = maxWidth
-      if @y > maxHeight then @y = -@height/2
-      if @y < -@height/2 then @y = maxHeight
-
-    draw: () ->
+      if @x > maxWidth then @x = -@width / 2
+      if @x < -@width / 2 then @x = maxWidth
+      if @y > maxHeight then @y = -@height / 2
+      if @y < -@height / 2 then @y = maxHeight
 
   class Ship extends Entity
     width: 20
     height: 10
 
-    constructor: (x, y)->
+    constructor: (x, y) ->
       @x = x
       @y = y
 
@@ -41,7 +38,7 @@ $ ->
     height: 100
     image: null
 
-    constructor: (image, velX, velY)->
+    constructor: (image, velX, velY) ->
       @image = image
       @velX = velX
       @velY = velY
@@ -56,13 +53,13 @@ $ ->
     $.Deferred((deferred) ->
       image = new Image()
       image.src = url
-      image.onload = () ->
+      image.onload = ->
         cleanup()
         deferred.resolve(image)
       image.onerror = (err) ->
         cleanup()
         deferred.reject("Unable to load #{url}")
-      cleanup = () ->
+      cleanup = ->
         image.onload = null
         image.onerror = null
     ).promise()
@@ -84,17 +81,17 @@ $ ->
     # Setup some useful variables
     canvas = $('#gameScreen')[0]
     ctx = canvas.getContext('2d')
-    ship = new Ship(window.innerWidth/2, window.innerHeight/2)
+    ship = new Ship(window.innerWidth / 2, window.innerHeight / 2)
     asteroids = [1..100].map((i) ->
-      new Asteroid(images[i%4],
-        Math.random()*10 - Math.random()*10,
-        Math.random()*10 - Math.random()*10)
+      new Asteroid(images[i % 4],
+        Math.random() * 10 - Math.random() * 10,
+        Math.random() * 10 - Math.random() * 10)
     )
     entities = [ship]
     Array.prototype.push.apply(entities, asteroids)
 
     # Game loop!
-    setInterval((=>
+    setInterval((->
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
       ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -102,7 +99,7 @@ $ ->
         entity.draw(ctx)
         entity.tick(window.innerWidth, window.innerHeight)
     ),10)
-
   ).fail((err) ->
-    console.error err
+    console.error(err)
   )
+)

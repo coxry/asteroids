@@ -33,8 +33,6 @@
         }
       };
 
-      Entity.prototype.draw = function() {};
-
       return Entity;
 
     })();
@@ -116,8 +114,7 @@
       });
     };
     return $.whenall([$.loadImage('./images/asteroid1.png'), $.loadImage('./images/asteroid2.png'), $.loadImage('./images/asteroid3.png'), $.loadImage('./images/asteroid4.png')]).done(function(images) {
-      var asteroids, canvas, ctx, entities, ship, _i, _results,
-        _this = this;
+      var asteroids, canvas, ctx, entities, ship, _i, _results;
       canvas = $('#gameScreen')[0];
       ctx = canvas.getContext('2d');
       ship = new Ship(window.innerWidth / 2, window.innerHeight / 2);
