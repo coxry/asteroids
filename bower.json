@@ -1,0 +1,25 @@
+{
+  "name": "Asteroids",
+  "main": "Asteroids.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/coxry/Asteroids",
+  "authors": [
+    "Raymond Cox <raymond@helios.raymondjcox.com>"
+  ],
+  "description": "An asteroids clone",
+  "keywords": [
+    "Asteroids"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "es6-promise": "~1.0.0"
+  }
+}

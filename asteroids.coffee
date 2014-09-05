@@ -49,35 +49,29 @@ $(->
       ctx.drawImage(@image, 0, 0)
       ctx.restore()
 
-  $.loadImage = (url) ->
-    $.Deferred((deferred) ->
+  loadImage = (url) ->
+    new Promise((resolve, reject) ->
       image = new Image()
       image.src = url
       image.onload = ->
         cleanup()
-        deferred.resolve(image)
+        resolve(image)
       image.onerror = (err) ->
         cleanup()
-        deferred.reject("Unable to load #{url}")
+        reject(Error("Unable to load #{url}"))
       cleanup = ->
         image.onload = null
         image.onerror = null
-    ).promise()
-
-  $.whenall = (arr) ->
-    $.when.apply($, arr).then(->
-      Array.prototype.slice.call(arguments)
     )
 
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
-  $.whenall([
-    $.loadImage('./images/asteroid1.png'),
-    $.loadImage('./images/asteroid2.png'),
-    $.loadImage('./images/asteroid3.png'),
-    $.loadImage('./images/asteroid4.png')
-  ]).done((images) ->
-
+  Promise.all([
+    loadImage('./images/asteroid1.png'),
+    loadImage('./images/asteroid2.png'),
+    loadImage('./images/asteroid3.png'),
+    loadImage('./images/asteroid4.png')
+  ]).then((images) ->
     # Setup some useful variables
     canvas = $('#gameScreen')[0]
     ctx = canvas.getContext('2d')
@@ -91,15 +85,15 @@ $(->
     Array.prototype.push.apply(entities, asteroids)
 
     # Game loop!
-    setInterval((->
+    setInterval(->
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       for entity in entities
         entity.draw(ctx)
         entity.tick(window.innerWidth, window.innerHeight)
-    ),10)
-  ).fail((err) ->
+    ,10)
+  ,(err) ->
     console.error(err)
   )
 )

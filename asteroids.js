@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var Asteroid, Entity, Ship;
+    var Asteroid, Entity, Ship, loadImage;
     Entity = (function() {
       function Entity() {}
 
@@ -89,31 +89,26 @@
       return Asteroid;
 
     })(Entity);
-    $.loadImage = function(url) {
-      return $.Deferred(function(deferred) {
+    loadImage = function(url) {
+      return new Promise(function(resolve, reject) {
         var cleanup, image;
         image = new Image();
         image.src = url;
         image.onload = function() {
           cleanup();
-          return deferred.resolve(image);
+          return resolve(image);
         };
         image.onerror = function(err) {
           cleanup();
-          return deferred.reject("Unable to load " + url);
+          return reject(Error("Unable to load " + url));
         };
         return cleanup = function() {
           image.onload = null;
           return image.onerror = null;
         };
-      }).promise();
-    };
-    $.whenall = function(arr) {
-      return $.when.apply($, arr).then(function() {
-        return Array.prototype.slice.call(arguments);
       });
     };
-    return $.whenall([$.loadImage('./images/asteroid1.png'), $.loadImage('./images/asteroid2.png'), $.loadImage('./images/asteroid3.png'), $.loadImage('./images/asteroid4.png')]).done(function(images) {
+    return Promise.all([loadImage('./images/asteroid1.png'), loadImage('./images/asteroid2.png'), loadImage('./images/asteroid3.png'), loadImage('./images/asteroid4.png')]).then(function(images) {
       var asteroids, canvas, ctx, entities, ship, _i, _results;
       canvas = $('#gameScreen')[0];
       ctx = canvas.getContext('2d');
@@ -127,7 +122,7 @@
       });
       entities = [ship];
       Array.prototype.push.apply(entities, asteroids);
-      return setInterval((function() {
+      return setInterval(function() {
         var entity, _j, _len, _results1;
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -139,8 +134,8 @@
           _results1.push(entity.tick(window.innerWidth, window.innerHeight));
         }
         return _results1;
-      }), 10);
-    }).fail(function(err) {
+      }, 10);
+    }, function(err) {
       return console.error(err);
     });
   });
