@@ -16,9 +16,9 @@
 
       Entity.prototype.y = 0;
 
-      Entity.prototype.tick = function(maxWidth, maxHeight) {
-        this.x += this.velX;
-        this.y += this.velY;
+      Entity.prototype.move = function(dt, maxWidth, maxHeight) {
+        this.x += this.velX * dt;
+        this.y += this.velY * dt;
         if (this.x > maxWidth) {
           this.x = -this.width / 2;
         }
@@ -43,10 +43,27 @@
 
       Ship.prototype.height = 10;
 
+      Ship.prototype.speed = 0.01;
+
       function Ship(x, y) {
         this.x = x;
         this.y = y;
       }
+
+      Ship.prototype.updateVelocity = function(keys) {
+        if (keys[38]) {
+          this.velY -= this.speed;
+        }
+        if (keys[40]) {
+          this.velY += this.speed;
+        }
+        if (keys[37]) {
+          this.velX -= this.speed;
+        }
+        if (keys[39]) {
+          return this.velX += this.speed;
+        }
+      };
 
       Ship.prototype.draw = function(ctx) {
         ctx.save();
@@ -108,39 +125,57 @@
         };
       });
     };
-    canvas = $('#gameScreen')[0];
-    ctx = canvas.getContext('2d');
+    canvas = $('#gameScreen').first();
+    ctx = canvas[0].getContext('2d');
+    resizeCanvas = function() {
+      canvas.attr('width', window.innerWidth);
+      return canvas.attr('height', window.innerHeight);
+    };
     window.onresize = function() {
       return resizeCanvas();
     };
-    resizeCanvas = function() {
-      canvas.width = window.innerWidth;
-      return canvas.height = window.innerHeight;
-    };
+    resizeCanvas();
     return Promise.all([loadImage('./images/asteroid1.png'), loadImage('./images/asteroid2.png'), loadImage('./images/asteroid3.png'), loadImage('./images/asteroid4.png')]).then(function(images) {
-      var asteroids, entities, ship, _i, _results;
-      resizeCanvas();
+      var asteroids, entities, frames, gameLoop, keys, oldTime, ship, time;
       ship = new Ship(window.innerWidth / 2, window.innerHeight / 2);
-      asteroids = (function() {
-        _results = [];
-        for (_i = 1; _i <= 100; _i++){ _results.push(_i); }
-        return _results;
-      }).apply(this).map(function(i) {
-        return new Asteroid(images[i % 4], Math.random() * 10 - Math.random() * 10, Math.random() * 10 - Math.random() * 10);
+      asteroids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function(i) {
+        return new Asteroid(images[i % 4], Math.random() / 2 - Math.random() / 2, Math.random() / 2 - Math.random() / 2);
       });
       entities = [ship];
       Array.prototype.push.apply(entities, asteroids);
-      return setInterval(function() {
-        var entity, _j, _len, _results1;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        _results1 = [];
-        for (_j = 0, _len = entities.length; _j < _len; _j++) {
-          entity = entities[_j];
-          entity.draw(ctx);
-          _results1.push(entity.tick(canvas.width, canvas.height));
+      keys = [];
+      window.onkeydown = function(event) {
+        return keys[event.keyCode] = true;
+      };
+      window.onkeyup = function(event) {
+        return keys[event.keyCode] = false;
+      };
+      frames = 0;
+      time = null;
+      oldTime = new Date().getTime();
+      gameLoop = (function() {
+        var ch, cw, dt, entity, now, _i, _len;
+        now = new Date().getTime();
+        dt = now - (time || now);
+        time = now;
+        if (time - oldTime > 1000) {
+          oldTime = time;
+          console.debug(frames);
+          frames = 0;
         }
-        return _results1;
-      }, 10);
+        cw = parseInt(canvas.attr('width'));
+        ch = parseInt(canvas.attr('height'));
+        ctx.fillRect(0, 0, cw, ch);
+        ship.updateVelocity(keys);
+        for (_i = 0, _len = entities.length; _i < _len; _i++) {
+          entity = entities[_i];
+          entity.draw(ctx);
+          entity.move(dt, cw, ch);
+        }
+        frames = frames + 1;
+        return window.requestAnimationFrame(gameLoop);
+      });
+      return gameLoop();
     }, function(err) {
       return console.error(err);
     });

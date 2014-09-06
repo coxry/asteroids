@@ -5,9 +5,9 @@ $(->
     x: 0
     y: 0
 
-    tick: (maxWidth, maxHeight) ->
-      @x += @velX
-      @y += @velY
+    move: (dt, maxWidth, maxHeight) ->
+      @x += @velX * dt
+      @y += @velY * dt
       if @x > maxWidth then @x = -@width / 2
       if @x < -@width / 2 then @x = maxWidth
       if @y > maxHeight then @y = -@height / 2
@@ -16,10 +16,21 @@ $(->
   class Ship extends Entity
     width: 20
     height: 10
+    speed: 0.01
 
     constructor: (x, y) ->
       @x = x
       @y = y
+
+    updateVelocity: (keys) ->
+      # Up
+      if keys[38] then @velY -= @speed
+      # Down
+      if keys[40] then @velY += @speed
+      # Left
+      if keys[37] then @velX -= @speed
+      # Right
+      if keys[39] then @velX += @speed
 
     draw: (ctx) ->
       ctx.save()
@@ -64,15 +75,15 @@ $(->
         image.onerror = null
     )
 
-  canvas = $('#gameScreen')[0]
-  ctx = canvas.getContext('2d')
+  canvas = $('#gameScreen').first()
+  ctx = canvas[0].getContext('2d')
 
-  window.onresize = -> resizeCanvas()
-
+  # Useful for fullscreen canvas
   resizeCanvas = ->
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
+    canvas.attr('width', window.innerWidth)
+    canvas.attr('height', window.innerHeight)
+  window.onresize = -> resizeCanvas()
+  resizeCanvas()
 
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
@@ -83,24 +94,59 @@ $(->
     loadImage('./images/asteroid4.png')
   ]).then((images) ->
 
-    resizeCanvas()
     # Setup some useful variables
     ship = new Ship(window.innerWidth / 2, window.innerHeight / 2)
-    asteroids = [1..100].map((i) ->
+    asteroids = [1..10].map((i) ->
       new Asteroid(images[i % 4],
-        Math.random() * 10 - Math.random() * 10,
-        Math.random() * 10 - Math.random() * 10)
+        Math.random() / 2 - Math.random() / 2,
+        Math.random() / 2 - Math.random() / 2)
     )
     entities = [ship]
     Array.prototype.push.apply(entities, asteroids)
 
+    # Events for handling ship movement
+    keys = []
+    window.onkeydown = (event) ->
+      keys[event.keyCode] = true
+    window.onkeyup = (event) ->
+      keys[event.keyCode] = false
+
+    # Variables for handing FPS and dt
+    frames = 0
+    time = null
+    oldTime = new Date().getTime()
+
     # Game loop!
-    setInterval(->
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    gameLoop = (->
+      now = new Date().getTime()
+      dt = now - (time or now)
+      time = now
+
+      # Log FPS every second
+      if time - oldTime > 1000
+        oldTime = time
+        console.debug(frames)
+        frames = 0
+
+      # Clear the screen
+      cw = parseInt(canvas.attr('width'))
+      ch = parseInt(canvas.attr('height'))
+      ctx.fillRect(0, 0, cw, ch)
+
+      ship.updateVelocity(keys)
+
+      # Draw the game + move the entities
       for entity in entities
         entity.draw(ctx)
-        entity.tick(canvas.width, canvas.height)
-    ,10)
+        entity.move(dt, cw, ch)
+
+      frames = frames + 1
+      # Let your browser decide when to run the loop again
+      window.requestAnimationFrame(gameLoop)
+    )
+    gameLoop()
+
+  # If there was an error loading images
   ,(err) ->
     console.error(err)
   )
