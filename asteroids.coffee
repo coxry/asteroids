@@ -8,10 +8,10 @@ $(->
     move: (dt, maxWidth, maxHeight) ->
       @x += @velX * dt
       @y += @velY * dt
-      if @x > maxWidth then @x = -@width / 2
-      if @x < -@width / 2 then @x = maxWidth
-      if @y > maxHeight then @y = -@height / 2
-      if @y < -@height / 2 then @y = maxHeight
+      if @x > maxWidth then @x = -@width
+      if @x < -@width then @x = maxWidth
+      if @y > maxHeight then @y = -@height
+      if @y < -@height then @y = maxHeight
 
   class Ship extends Entity
     width: 20
@@ -78,13 +78,6 @@ $(->
   canvas = $('#gameScreen').first()
   ctx = canvas[0].getContext('2d')
 
-  # Useful for fullscreen canvas
-  resizeCanvas = ->
-    canvas.attr('width', window.innerWidth)
-    canvas.attr('height', window.innerHeight)
-  window.onresize = -> resizeCanvas()
-  resizeCanvas()
-
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
@@ -95,8 +88,8 @@ $(->
   ]).then((images) ->
 
     # Setup some useful variables
-    ship = new Ship(window.innerWidth / 2, window.innerHeight / 2)
-    asteroids = [1..10].map((i) ->
+    ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2)
+    asteroids = [1..5].map((i) ->
       new Asteroid(images[i % 4],
         Math.random() / 2 - Math.random() / 2,
         Math.random() / 2 - Math.random() / 2)

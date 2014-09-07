@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var Asteroid, Entity, Ship, canvas, ctx, loadImage, resizeCanvas;
+    var Asteroid, Entity, Ship, canvas, ctx, loadImage;
     Entity = (function() {
       function Entity() {}
 
@@ -20,15 +20,15 @@
         this.x += this.velX * dt;
         this.y += this.velY * dt;
         if (this.x > maxWidth) {
-          this.x = -this.width / 2;
+          this.x = -this.width;
         }
-        if (this.x < -this.width / 2) {
+        if (this.x < -this.width) {
           this.x = maxWidth;
         }
         if (this.y > maxHeight) {
-          this.y = -this.height / 2;
+          this.y = -this.height;
         }
-        if (this.y < -this.height / 2) {
+        if (this.y < -this.height) {
           return this.y = maxHeight;
         }
       };
@@ -127,18 +127,10 @@
     };
     canvas = $('#gameScreen').first();
     ctx = canvas[0].getContext('2d');
-    resizeCanvas = function() {
-      canvas.attr('width', window.innerWidth);
-      return canvas.attr('height', window.innerHeight);
-    };
-    window.onresize = function() {
-      return resizeCanvas();
-    };
-    resizeCanvas();
     return Promise.all([loadImage('./images/asteroid1.png'), loadImage('./images/asteroid2.png'), loadImage('./images/asteroid3.png'), loadImage('./images/asteroid4.png')]).then(function(images) {
       var asteroids, entities, frames, gameLoop, keys, oldTime, ship, time;
-      ship = new Ship(window.innerWidth / 2, window.innerHeight / 2);
-      asteroids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function(i) {
+      ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2);
+      asteroids = [1, 2, 3, 4, 5].map(function(i) {
         return new Asteroid(images[i % 4], Math.random() / 2 - Math.random() / 2, Math.random() / 2 - Math.random() / 2);
       });
       entities = [ship];
