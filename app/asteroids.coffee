@@ -17,6 +17,7 @@ $(->
     width: 20
     height: 10
     speed: 0.01
+    rotation: 0
 
     constructor: (x, y) ->
       @x = x
@@ -24,21 +25,25 @@ $(->
 
     updateVelocity: (keys) ->
       # Up
-      if keys[38] then @velY -= @speed
-      # Down
-      if keys[40] then @velY += @speed
+      if keys[38]
+        @velX -= Math.cos(@rotation)*@speed
+        @velY -= Math.sin(@rotation)*@speed
       # Left
-      if keys[37] then @velX -= @speed
+      if keys[37] then @rotation -= 0.1
       # Right
-      if keys[39] then @velX += @speed
+      if keys[39] then @rotation += 0.1
 
     draw: (ctx) ->
       ctx.save()
       ctx.translate(@x,@y)
+      # + 2 for the lines on the spaceship
+      ctx.translate(@width / 2 + 2,0)
+      ctx.rotate(@rotation)
+      ctx.translate(-(@width / 2 + 2),0)
       ctx.beginPath()
       ctx.moveTo(0,0)
-      ctx.lineTo(20,-10)
-      ctx.lineTo(20,10)
+      ctx.lineTo(@width,-@height)
+      ctx.lineTo(@width,@height)
       ctx.closePath()
       ctx.strokeStyle = '#FF0000'
       ctx.stroke()
