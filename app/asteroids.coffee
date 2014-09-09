@@ -18,6 +18,7 @@ $(->
     height: 10
     speed: 0.01
     rotation: 0
+    maxSpeed: 0.2
 
     constructor: (x, y) ->
       @x = x
@@ -26,8 +27,15 @@ $(->
     updateVelocity: (keys) ->
       # Up
       if keys[38]
-        @velX -= Math.cos(@rotation)*@speed
-        @velY -= Math.sin(@rotation)*@speed
+        x = @velX - Math.cos(@rotation) * @speed
+        y = @velY - Math.sin(@rotation) * @speed
+        @velX = x
+        @velY = y
+        v = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
+        if v > @maxSpeed
+          scale = @maxSpeed / v
+          @velX *= scale
+          @velY *= scale
       # Left
       if keys[37] then @rotation -= 0.1
       # Right
