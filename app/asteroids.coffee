@@ -123,6 +123,10 @@ $(->
     time = null
     oldTime = new Date().getTime()
 
+    # Canvas width and height
+    cw = parseInt(canvas.attr('width'))
+    ch = parseInt(canvas.attr('height'))
+
     # Game loop!
     gameLoop = (->
       now = new Date().getTime()
@@ -136,10 +140,6 @@ $(->
         frames = 0
 
       # Clear the screen
-      cw = parseInt(canvas.attr('width'))
-      ch = parseInt(canvas.attr('height'))
-
-      # Draw the background
       ctx.fillRect(0, 0, cw, ch)
 
       # Draw the game, move the entities
