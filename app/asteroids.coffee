@@ -53,25 +53,36 @@ $(->
       ctx.lineTo(@width,-@height)
       ctx.lineTo(@width,@height)
       ctx.closePath()
-      ctx.strokeStyle = '#FF0000'
+      ctx.strokeStyle = '#FFFFFF'
+      ctx.lineWidth = 1
       ctx.stroke()
       ctx.restore()
 
   class Asteroid extends Entity
     width: 100
     height: 100
+    rotation: 0
+    rotationSpeed: 0
     image: null
 
-    constructor: (image, velX, velY) ->
+    constructor: (image, velX, velY, rotation, rotationSpeed) ->
       @image = image
       @velX = velX
       @velY = velY
+      @rotation = rotation
+      @rotationSpeed = rotationSpeed
 
     draw: (ctx) ->
       ctx.save()
       ctx.translate(@x,@y)
+      ctx.translate(@width / 2 + 2, @height / 2 + 2)
+      ctx.rotate(@rotation)
+      ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
       ctx.drawImage(@image, 0, 0)
       ctx.restore()
+      # This should be in an asteroid specific method
+      # like updateVelocity is for ships
+      @rotation += @rotationSpeed
 
   loadImage = (url) ->
     new Promise((resolve, reject) ->
@@ -94,18 +105,16 @@ $(->
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
-    loadImage('./images/asteroid1.png'),
-    loadImage('./images/asteroid2.png'),
-    loadImage('./images/asteroid3.png'),
-    loadImage('./images/asteroid4.png')
+    loadImage('./images/asteroid.png')
   ]).then((images) ->
-
     # Setup some useful variables
     ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2)
     asteroids = [1..5].map((i) ->
-      new Asteroid(images[i % 4],
-        Math.random() / 2 - Math.random() / 2,
-        Math.random() / 2 - Math.random() / 2)
+      new Asteroid(images[i % images.length],
+        Math.random() / 4 - Math.random() / 4,
+        Math.random() / 4 - Math.random() / 4,
+        Math.random(),
+        Math.random() / 15 - Math.random() / 15)
     )
     entities = [ship]
     Array.prototype.push.apply(entities, asteroids)
@@ -137,6 +146,8 @@ $(->
       # Clear the screen
       cw = parseInt(canvas.attr('width'))
       ch = parseInt(canvas.attr('height'))
+
+      ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, cw, ch)
 
       ship.updateVelocity(keys)
