@@ -19,14 +19,19 @@ $(->
     speed: 0.01
     rotation: 0
     maxSpeed: 0.2
+    keys: []
 
     constructor: (x, y) ->
+      window.onkeydown = (event) =>
+        @keys[event.keyCode] = true
+      window.onkeyup = (event) =>
+        @keys[event.keyCode] = false
       @x = x
       @y = y
 
-    updateVelocity: (keys) ->
+    move: (dt, maxWidth, maxHeight) ->
       # Up
-      if keys[38]
+      if @keys[38]
         x = @velX - Math.cos(@rotation) * @speed
         y = @velY - Math.sin(@rotation) * @speed
         @velX = x
@@ -37,9 +42,10 @@ $(->
           @velX *= scale
           @velY *= scale
       # Left
-      if keys[37] then @rotation -= 0.1
+      if @keys[37] then @rotation -= 0.1
       # Right
-      if keys[39] then @rotation += 0.1
+      if @keys[39] then @rotation += 0.1
+      super(dt, maxWidth, maxHeight)
 
     draw: (ctx) ->
       ctx.save()
@@ -59,18 +65,18 @@ $(->
       ctx.restore()
 
   class Asteroid extends Entity
-    width: 100
-    height: 100
-    rotation: 0
-    rotationSpeed: 0
-    image: null
-
-    constructor: (image, velX, velY, rotation, rotationSpeed) ->
+    constructor: (image)  ->
       @image = image
-      @velX = velX
-      @velY = velY
-      @rotation = rotation
-      @rotationSpeed = rotationSpeed
+      @width = image.width
+      @height = image.height
+      @velX = Math.random() / 4 - Math.random() / 4
+      @velY = Math.random() / 4 - Math.random() / 4
+      @rotation = Math.random()
+      @rotationSpeed = Math.random() / 15 - Math.random() / 15
+
+    move: (dt, maxWidth, maxHeight) ->
+      @rotation += @rotationSpeed
+      super(dt, maxWidth, maxHeight)
 
     draw: (ctx) ->
       ctx.save()
@@ -80,9 +86,6 @@ $(->
       ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
       ctx.drawImage(@image, 0, 0)
       ctx.restore()
-      # This should be in an asteroid specific method
-      # like updateVelocity is for ships
-      @rotation += @rotationSpeed
 
   loadImage = (url) ->
     new Promise((resolve, reject) ->
@@ -110,21 +113,10 @@ $(->
     # Setup some useful variables
     ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2)
     asteroids = [1..5].map((i) ->
-      new Asteroid(images[i % images.length],
-        Math.random() / 4 - Math.random() / 4,
-        Math.random() / 4 - Math.random() / 4,
-        Math.random(),
-        Math.random() / 15 - Math.random() / 15)
+      new Asteroid(images[i % images.length])
     )
     entities = [ship]
     Array.prototype.push.apply(entities, asteroids)
-
-    # Events for handling ship movement
-    keys = []
-    window.onkeydown = (event) ->
-      keys[event.keyCode] = true
-    window.onkeyup = (event) ->
-      keys[event.keyCode] = false
 
     # Variables for handing FPS and dt
     frames = 0
@@ -147,12 +139,10 @@ $(->
       cw = parseInt(canvas.attr('width'))
       ch = parseInt(canvas.attr('height'))
 
-      ctx.fillStyle = '#000000'
+      # Draw the background
       ctx.fillRect(0, 0, cw, ch)
 
-      ship.updateVelocity(keys)
-
-      # Draw the game + move the entities
+      # Draw the game, move the entities
       for entity in entities
         entity.draw(ctx)
         entity.move(dt, cw, ch)
