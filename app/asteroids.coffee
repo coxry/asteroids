@@ -13,19 +13,30 @@ $(->
       if @y > maxHeight then @y = -@height
       if @y < -@height then @y = maxHeight
 
+    reap: ->
+      false
+
   class Bullet extends Entity
+    width: 4
+    height: 4
+    ticksTillReap: 500
+
     constructor: (x, y, velX, velY) ->
-      @width = 4
-      @height = 4
       @x = x - @width / 2
       @y = y - @height / 2
       @velX = velX
       @velY = velY
 
+    reap: ->
+      --@ticksTillReap < 0
+
     draw: (ctx) ->
       ctx.fillStyle = '#FFFFFF'
       ctx.fillRect(@x, @y, @width, @height)
 
+    move: (dt) ->
+      @x += @velX * dt
+      @y += @velY * dt
 
   class Ship extends Entity
     width: 20
@@ -33,6 +44,8 @@ $(->
     speed: 0.022
     rotation: 0
     maxSpeed: 0.3
+    fireWait: 25
+    fireTick: 25
     keys: []
 
     constructor: (x, y) ->
@@ -62,11 +75,14 @@ $(->
       super(dt, maxWidth, maxHeight)
 
     fireBullet: ->
+      @fireTick = @fireTick + 1
       # Space
-      if @keys[32]
+      if @keys[32] and @fireTick >= @fireWait
+        @fireTick = 0
         xr = Math.cos(@rotation)
         yr = Math.sin(@rotation)
-        new Bullet(@x - @width * xr + @width / 2, @y - @width * yr, -xr, -yr)
+        new Bullet(@x - @width * xr + @width / 2, @y - @width * yr,
+          @velX + -xr / 5, @velY + -yr / 5)
 
     draw: (ctx) ->
       ctx.save()
@@ -165,10 +181,17 @@ $(->
       ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, cw, ch)
 
+      reapEntities = []
+
       # Draw the game, move the entities
       for entity in entities
         entity.draw(ctx)
         entity.move(dt, cw, ch)
+        reapEntities.push(entity) if entity.reap()
+
+      for entity in reapEntities
+        entities.splice(entities.indexOf(entity), 1)
+
 
       # Fire the lazers
       bullet = ship.fireBullet()
