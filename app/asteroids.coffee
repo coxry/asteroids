@@ -30,9 +30,9 @@ $(->
   class Ship extends Entity
     width: 20
     height: 10
-    speed: 0.01
+    speed: 0.022
     rotation: 0
-    maxSpeed: 0.2
+    maxSpeed: 0.3
     keys: []
 
     constructor: (x, y) ->
