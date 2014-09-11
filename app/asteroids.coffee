@@ -37,7 +37,6 @@ $(->
 
     constructor: (x, y) ->
       window.onkeydown = (event) =>
-        console.debug event.keyCode
         @keys[event.keyCode] = true
       window.onkeyup = (event) =>
         @keys[event.keyCode] = false
@@ -67,7 +66,7 @@ $(->
       if @keys[32]
         xr = Math.cos(@rotation)
         yr = Math.sin(@rotation)
-        new Bullet(@x - @width / 2, @y, -xr, -yr)
+        new Bullet(@x - @width * xr + @width / 2, @y - @width * yr, -xr, -yr)
 
     draw: (ctx) ->
       ctx.save()
