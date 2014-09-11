@@ -41,14 +41,14 @@ $(->
   class Ship extends Entity
     width: 20
     height: 10
-    speed: 0.022
+    speed: 0.012
     rotation: 0
     maxSpeed: 0.3
     fireWait: 25
-    fireTick: 25
     keys: []
 
     constructor: (x, y) ->
+      @fireTick = @fireWait
       window.onkeydown = (event) =>
         @keys[event.keyCode] = true
       window.onkeyup = (event) =>
@@ -75,6 +75,7 @@ $(->
       super(dt, maxWidth, maxHeight)
 
     fireBullet: ->
+      # Wait until you can fire
       @fireTick = @fireTick + 1
       # Space
       if @keys[32] and @fireTick >= @fireWait
