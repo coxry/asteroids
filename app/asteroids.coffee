@@ -13,6 +13,20 @@ $(->
       if @y > maxHeight then @y = -@height
       if @y < -@height then @y = maxHeight
 
+  class Bullet extends Entity
+    constructor: (x, y, velX, velY) ->
+      @width = 4
+      @height = 4
+      @x = x - @width / 2
+      @y = y - @height / 2
+      @velX = velX
+      @velY = velY
+
+    draw: (ctx) ->
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(@x, @y, @width, @height)
+
+
   class Ship extends Entity
     width: 20
     height: 10
@@ -23,6 +37,7 @@ $(->
 
     constructor: (x, y) ->
       window.onkeydown = (event) =>
+        console.debug event.keyCode
         @keys[event.keyCode] = true
       window.onkeyup = (event) =>
         @keys[event.keyCode] = false
@@ -46,6 +61,13 @@ $(->
       # Right
       if @keys[39] then @rotation += 0.1
       super(dt, maxWidth, maxHeight)
+
+    fireBullet: ->
+      # Space
+      if @keys[32]
+        xr = Math.cos(@rotation)
+        yr = Math.sin(@rotation)
+        new Bullet(@x - @width / 2, @y, -xr, -yr)
 
     draw: (ctx) ->
       ctx.save()
@@ -115,6 +137,7 @@ $(->
     asteroids = [1..5].map((i) ->
       new Asteroid(images[i % images.length])
     )
+    bullets = []
     entities = [ship]
     Array.prototype.push.apply(entities, asteroids)
 
@@ -140,12 +163,19 @@ $(->
         frames = 0
 
       # Clear the screen
+      ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, cw, ch)
 
       # Draw the game, move the entities
       for entity in entities
         entity.draw(ctx)
         entity.move(dt, cw, ch)
+
+      # Fire the lazers
+      bullet = ship.fireBullet()
+      if bullet?
+        entities.push(bullet)
+        bullets.push(bullet)
 
       frames = frames + 1
       # Let your browser decide when to run the loop again
