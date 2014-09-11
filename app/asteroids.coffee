@@ -42,6 +42,7 @@ $(->
     width: 20
     height: 10
     speed: 0.012
+    bulletSpeed: 0.4
     rotation: 0
     maxSpeed: 0.3
     fireWait: 25
@@ -83,7 +84,7 @@ $(->
         xr = Math.cos(@rotation)
         yr = Math.sin(@rotation)
         new Bullet(@x - @width * xr + @width / 2, @y - @width * yr,
-          @velX + -xr / 5, @velY + -yr / 5)
+          @velX + -xr * @bulletSpeed, @velY + -yr * @bulletSpeed)
 
     draw: (ctx) ->
       ctx.save()
