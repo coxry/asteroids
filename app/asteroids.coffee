@@ -155,7 +155,6 @@ $(->
     asteroids = [1..5].map((i) ->
       new Asteroid(images[i % images.length])
     )
-    bullets = []
     entities = [ship]
     Array.prototype.push.apply(entities, asteroids)
 
@@ -195,12 +194,9 @@ $(->
       for entity in reapEntities
         entities.splice(entities.indexOf(entity), 1)
 
-
       # Fire the lazers
       bullet = ship.fireBullet()
-      if bullet?
-        entities.push(bullet)
-        bullets.push(bullet)
+      entities.push(bullet) if bullet?
 
       frames = frames + 1
       # Let your browser decide when to run the loop again
