@@ -44,8 +44,9 @@ $(->
     speed: 0.012
     bulletSpeed: 0.4
     rotation: 0
-    maxSpeed: 0.3
+    maxSpeed: 1
     fireWait: 25
+    rotationSpeed: 0.0085
     keys: []
 
     constructor: (x, y) ->
@@ -70,9 +71,9 @@ $(->
           @velX *= scale
           @velY *= scale
       # Left
-      if @keys[37] then @rotation -= 0.1
+      if @keys[37] then @rotation -= @rotationSpeed * dt
       # Right
-      if @keys[39] then @rotation += 0.1
+      if @keys[39] then @rotation += @rotationSpeed * dt
       super(dt, maxWidth, maxHeight)
 
     fireBullet: ->
