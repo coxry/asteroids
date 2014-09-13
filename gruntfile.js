@@ -30,8 +30,6 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: ['vendor/rAF.js',
-              'bower_components/es5-shim/es5-shim.js',
-              'bower_components/es5-shim/es5-sham.js',
               'bower_components/es6-promise/promise.js',
               'bower_components/jquery/dist/jquery.js',
               'bower_comonents/bootstrap/dist/js/bootstrap.js',
