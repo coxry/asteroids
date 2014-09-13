@@ -201,7 +201,7 @@ $(->
 
       switch state
         when 'menu'
-          fadeTick += 0.01 if fadeTick < 1
+          fadeTick += 0.0005 * dt if fadeTick < 1
           ctx.font = "14pt 'Open Sans', sans-serif"
           ctx.fillStyle = "rgba(200,200,200,#{fadeTick})"
           ctx.fillText(txt, (cw - ctx.measureText(txt).width) / 2, ch / 2)
