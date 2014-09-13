@@ -113,10 +113,10 @@ $(->
       @x = x or 0
       @y = y or 0
       @rotation = Math.random()
-      @rotationSpeed = Math.random() / 15 - Math.random() / 15
+      @rotationSpeed = Math.random() / 800  - Math.random() / 800
 
     move: (dt, maxWidth, maxHeight) ->
-      @rotation += @rotationSpeed
+      @rotation += @rotationSpeed * dt
       super(dt, maxWidth, maxHeight)
 
     draw: (ctx) ->
