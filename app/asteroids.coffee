@@ -51,12 +51,11 @@ $(->
 
     constructor: (x, y) ->
       @fireTick = @fireWait
-      window.onkeydown = (event) =>
-        @keys[event.keyCode] = true
-      window.onkeyup = (event) =>
-        @keys[event.keyCode] = false
       @x = x
       @y = y
+
+    setKeys: (keys) ->
+      @keys = keys
 
     move: (dt, maxWidth, maxHeight) ->
       # Up
@@ -105,12 +104,14 @@ $(->
       ctx.restore()
 
   class Asteroid extends Entity
-    constructor: (image)  ->
+    constructor: (image, x, y)  ->
       @image = image
       @width = image.width
       @height = image.height
       @velX = Math.random() / 4 - Math.random() / 4
       @velY = Math.random() / 4 - Math.random() / 4
+      @x = x or 0
+      @y = y or 0
       @rotation = Math.random()
       @rotationSpeed = Math.random() / 15 - Math.random() / 15
 
@@ -150,13 +151,6 @@ $(->
   Promise.all([
     loadImage('./images/asteroid.png')
   ]).then((images) ->
-    # Setup some useful variables
-    ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2)
-    asteroids = [1..5].map((i) ->
-      new Asteroid(images[i % images.length])
-    )
-    entities = [ship]
-    Array.prototype.push.apply(entities, asteroids)
 
     # Variables for handing FPS and dt
     frames = 0
@@ -166,6 +160,25 @@ $(->
     # Canvas width and height
     cw = parseInt(canvas.attr('width'))
     ch = parseInt(canvas.attr('height'))
+
+    # Set initial state to menu (press space to start)
+    state = 'menu'
+
+    # Setup some useful variables in the menu state
+    ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2)
+    asteroids = [1..5].map((i) ->
+      new Asteroid(images[i % images.length],
+        Math.random() * 1000 % cw, Math.random() * 1000 % ch)
+    )
+    entities = []
+    Array.prototype.push.apply(entities, asteroids)
+
+    # Keyboard handling
+    keys = []
+    window.onkeydown = (event) ->
+      keys[event.keyCode] = true
+    window.onkeyup = (event) ->
+      keys[event.keyCode] = false
 
     # Game loop!
     gameLoop = (->
@@ -183,9 +196,31 @@ $(->
       ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, cw, ch)
 
-      reapEntities = []
+      switch state
+        when 'menu'
+          txt = 'Press space to start'
+          ctx.font = '14pt Helvetica Neue,Helvetica,Arial,sans-serif'
+          ctx.fillStyle = '#CCCCCC'
+          ctx.fillText(txt, (cw - ctx.measureText(txt).width) / 2, ch / 2)
+          # Space
+          if keys[32]
+            keys[32] = false
+            state = 'leveldone'
 
-      # Draw the game, move the entities
+        # Setup the next level
+        when 'leveldone'
+          asteroids = [1..5].map((i) ->
+            new Asteroid(images[i % images.length])
+          )
+          entities = [ship]
+          Array.prototype.push.apply(entities, asteroids)
+          ship.setKeys(keys)
+          state = 'playing'
+
+      # Draw the game, move the entities which
+      # are also drawn in the 'menu' state so I keep this
+      # logic in here instead of just 'playing' state
+      reapEntities = []
       for entity in entities
         entity.draw(ctx)
         entity.move(dt, cw, ch)
