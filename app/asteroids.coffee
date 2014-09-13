@@ -172,6 +172,9 @@ $(->
     )
     entities = []
     Array.prototype.push.apply(entities, asteroids)
+    # The text fades in
+    txt = 'Press space to start'
+    fadeTick = 0
 
     # Keyboard handling
     keys = []
@@ -198,9 +201,9 @@ $(->
 
       switch state
         when 'menu'
-          txt = 'Press space to start'
-          ctx.font = '14pt Helvetica Neue,Helvetica,Arial,sans-serif'
-          ctx.fillStyle = '#CCCCCC'
+          fadeTick += 0.01 if fadeTick < 1
+          ctx.font = "14pt 'Open Sans', sans-serif"
+          ctx.fillStyle = "rgba(200,200,200,#{fadeTick})"
           ctx.fillText(txt, (cw - ctx.measureText(txt).width) / 2, ch / 2)
           # Space
           if keys[32]
