@@ -54,6 +54,25 @@ module.exports = function(grunt) {
           { src: ['app/index.html'], dest: 'dist/index.html' }
         ]
       }
+    },
+    uncss: {
+      dist: {
+        files: {
+          'dist/style.css': ['dist/index.html']
+        }
+      }
+    },
+
+    cssmin: {
+      my_target: {
+        files: [{
+          expand: true,
+          cwd: 'dist/',
+          src: ['*.css', '!*.min.css'],
+          dest: 'dist/',
+          ext: '.css'
+        }]
+      }
     }
   });
 
@@ -64,8 +83,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-uncss');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
 
   // Default task(s).
   // grunt.registerTask('default', ['uglify']);
-  grunt.registerTask('default', ['coffeelint', 'coffee', 'concat', 'uglify', 'copy']);
+  grunt.registerTask('default', ['coffeelint', 'coffee', 'concat', 'uglify', 'copy', 'uncss', 'cssmin']);
 };
