@@ -4,16 +4,15 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-  watch: {
-    scripts: {
-      files: ['app/*.html', 'app/*.coffee'],
-      tasks: ['default'],
-      options: {
-        spawn: false,
+    watch: {
+      scripts: {
+        files: ['app/*.html', 'app/*.coffee'],
+        tasks: ['default'],
+        options: {
+          spawn: false,
+        }
       }
-    }
-  },
-
+    },
     coffeelint: {
       options: {
         configFile: 'coffeelint.json'
@@ -39,7 +38,8 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+        sourceMap: true
       },
       build: {
         src: 'tmp/asteroids.js',
@@ -62,7 +62,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
     cssmin: {
       my_target: {
         files: [{
