@@ -125,16 +125,22 @@ $(->
       ctx.translate(@width / 2 + 2, @height / 2 + 2)
       ctx.rotate(@rotation)
       ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
-      ctx.drawImage(@image, 0, 0)
+      ctx.drawImage(@image, 0, 0, @width, @height, 0, 0, @width, @height)
       ctx.restore()
 
-  loadImage = (url) ->
+  loadImage = (url, width, height) ->
     new Promise((resolve, reject) ->
       image = new Image()
       image.src = url
+      image.width = width
+      image.height = height
       image.onload = ->
+        imageCanvas = document.createElement('canvas')
+        imageCanvas.width = width
+        imageCanvas.height = height
+        imageCanvas.getContext('2d').drawImage(image, 0, 0)
         cleanup()
-        resolve(image)
+        resolve(imageCanvas)
       image.onerror = (err) ->
         cleanup()
         reject(Error("Unable to load #{url}"))
@@ -149,7 +155,7 @@ $(->
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
-    loadImage('./images/asteroid.png')
+    loadImage('./images/asteroid.png', 128, 128)
   ]).then((images) ->
 
     # Variables for handing FPS and dt
@@ -200,7 +206,8 @@ $(->
 
       # Clear the screen
       ctx.fillStyle = '#000000'
-      ctx.fillRect(0, 0, cw, ch)
+      # ctx.fillRect(0, 0, cw, ch)
+      ctx.clearRect(0, 0, cw, ch)
 
       switch state
         when 'menu'
@@ -215,7 +222,7 @@ $(->
 
         # Setup the next level
         when 'leveldone'
-          asteroids = [1..5].map((i) ->
+          asteroids = [1..2].map((i) ->
             new Asteroid(images[i % images.length])
           )
           entities = [ship]
