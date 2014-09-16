@@ -56,8 +56,8 @@ $(->
     width: 20
     height: 10
     # Colllision box width & height
-    cWidth: 20
-    cHeight: 10
+    cWidth: 15
+    cHeight: 15
     speed: 0.012
     bulletSpeed: 0.4
     rotation: 0
@@ -125,8 +125,8 @@ $(->
       'ship'
 
   class Asteroid extends Entity
-    cWidth: 120
-    cHeight: 120
+    cWidth: 115
+    cHeight: 115
 
     constructor: (image, x, y)  ->
       @image = image
