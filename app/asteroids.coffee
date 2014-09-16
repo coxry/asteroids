@@ -13,12 +13,20 @@ $(->
       if @y > maxHeight then @y = -@height
       if @y < -@height then @y = maxHeight
 
+    collidesWith: (e) ->
+      @x + (@width - @cWidth) < e.x + e.cWidth and
+        @x + @cWidth > e.x + (e.width - e.cWidth) and
+        @y + (@height - @cHeight) < e.y + e.cHeight and
+        @y + @cHeight > e.y + (e.height - e.cHeight)
+
     reap: ->
       false
 
   class Bullet extends Entity
     width: 4
     height: 4
+    cWidth: 4
+    cHeight: 4
     ticksTillReap: 500
 
     constructor: (x, y, velX, velY) ->
@@ -41,11 +49,14 @@ $(->
   class Ship extends Entity
     width: 20
     height: 10
+    cWidth: 20
+    cHeight: 10
     speed: 0.012
     bulletSpeed: 0.4
     rotation: 0
     maxSpeed: 1
     fireWait: 25
+    color: '#FFFFFF'
     rotationSpeed: 0.0085
     keys: []
 
@@ -98,12 +109,15 @@ $(->
       ctx.lineTo(@width,-@height)
       ctx.lineTo(@width,@height)
       ctx.closePath()
-      ctx.strokeStyle = '#FFFFFF'
+      ctx.strokeStyle = @color
       ctx.lineWidth = 1
       ctx.stroke()
       ctx.restore()
 
   class Asteroid extends Entity
+    cWidth: 120
+    cHeight: 120
+
     constructor: (image, x, y)  ->
       @image = image
       @width = image.width
@@ -230,6 +244,13 @@ $(->
           ship.setKeys(keys)
           state = 'playing'
 
+      shipCollision = false
+      for asteroid in asteroids
+        if asteroid.collidesWith(ship)
+          shipCollision = true
+          break
+
+      if shipCollision then ship.color = '#FF0000' else ship.color = '#FFFFFF'
       # Draw the game, move the entities which
       # are also drawn in the 'menu' state so I keep this
       # logic in here instead of just 'playing' state
