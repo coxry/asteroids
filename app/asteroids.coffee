@@ -14,10 +14,10 @@ $(->
       if @y < -@height then @y = maxHeight
 
     collidesWith: (e) ->
-      @x + (@width - @cWidth) < e.x + e.cWidth and
-        @x + @cWidth > e.x + (e.width - e.cWidth) and
-        @y + (@height - @cHeight) < e.y + e.cHeight and
-        @y + @cHeight > e.y + (e.height - e.cHeight)
+      @x + (@width - @cWidth) / 2 < e.x + e.cWidth + (e.width - e.cWidth) / 2 + e.cOffX and
+        @x + @cWidth + (@width - @cWidth) / 2 + @cOffX > e.x + (e.width - e.cWidth) / 2 + e.cOffX and
+        @y + (@height - @cHeight) / 2 < e.y + e.cHeight + (e.height - e.cHeight) / 2 + e.cOffY and
+        @y + @cHeight + (@height - @cHeight) / 2 + @cOffY > e.y + (e.height - e.cHeight) / 2 + e.cOffY
 
     reap: ->
       false
@@ -53,11 +53,13 @@ $(->
 
   class Ship extends Entity
     # Width & height used for drawing
-    width: 20
-    height: 10
+    width: 8
+    height: 16
     # Colllision box width & height
     cWidth: 15
-    cHeight: 15
+    cHeight: 10
+    cOffX: -4
+    cOffY: 0
     speed: 0.012
     bulletSpeed: 0.4
     rotation: 0
@@ -101,32 +103,38 @@ $(->
         @fireTick = 0
         xr = Math.cos(@rotation)
         yr = Math.sin(@rotation)
-        new Bullet(@x - @width * xr + @width / 2, @y - @width * yr,
+        new Bullet(@x - (@width + 2) * xr + @width / 2,
+          @y - @height / 2 * yr + @height / 2,
           @velX + -xr * @bulletSpeed, @velY + -yr * @bulletSpeed)
 
     draw: (ctx) ->
       ctx.save()
       ctx.translate(@x,@y)
-      # + 2 for the lines on the spaceship
-      ctx.translate(@width / 2 + 2,0)
+      # 2 for the lines on the spaceship
+      ctx.translate(2, @height / 2)
       ctx.rotate(@rotation)
-      ctx.translate(-(@width / 2 + 2),0)
+      ctx.translate(-2, -(@height / 2))
       ctx.beginPath()
-      ctx.moveTo(0,0)
-      ctx.lineTo(@width,-@height)
-      ctx.lineTo(@width,@height)
+      ctx.moveTo(@width, @height)
+      ctx.lineTo(-@width, @height / 2)
+      ctx.lineTo(@width, 0)
       ctx.closePath()
       ctx.strokeStyle = @color
       ctx.lineWidth = 1
       ctx.stroke()
       ctx.restore()
+      ctx.strokeStyle = '#00FF00'
+      ctx.strokeRect(@x + (@width - @cWidth) / 2 + @cOffX,
+        @y + (@height - @cHeight) / 2 + @cOffY, @cWidth, @cHeight)
 
     toString: ->
       'ship'
 
   class Asteroid extends Entity
-    cWidth: 115
-    cHeight: 115
+    cWidth: 100
+    cHeight: 100
+    cOffX: 2
+    cOffY: 2
 
     constructor: (image, x, y)  ->
       @image = image
@@ -151,6 +159,9 @@ $(->
       ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
       ctx.drawImage(@image, 0, 0, @width, @height, 0, 0, @width, @height)
       ctx.restore()
+      ctx.strokeStyle = '#FF0000'
+      ctx.strokeRect(@x + (@width - @cWidth) / 2 + 2,
+        @y + (@height - @cHeight) / 2 + 2, @cWidth, @cHeight)
 
     toString: ->
       'asteroid'
@@ -282,7 +293,7 @@ $(->
             state = 'setupPlaying'
 
         when 'setupPlaying'
-          asteroids = [1..2].map((i) ->
+          asteroids = [1..1].map((i) ->
             new Asteroid(images[i % images.length])
           )
           entities = []
