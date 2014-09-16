@@ -23,8 +23,10 @@ $(->
       false
 
   class Bullet extends Entity
+    # Width & height used for drawing
     width: 4
     height: 4
+    # Colllision box width & height
     cWidth: 4
     cHeight: 4
     ticksTillReap: 500
@@ -46,9 +48,14 @@ $(->
       @x += @velX * dt
       @y += @velY * dt
 
+    toString: ->
+      'bullet'
+
   class Ship extends Entity
+    # Width & height used for drawing
     width: 20
     height: 10
+    # Colllision box width & height
     cWidth: 20
     cHeight: 10
     speed: 0.012
@@ -114,6 +121,9 @@ $(->
       ctx.stroke()
       ctx.restore()
 
+    toString: ->
+      'ship'
+
   class Asteroid extends Entity
     cWidth: 120
     cHeight: 120
@@ -141,6 +151,9 @@ $(->
       ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
       ctx.drawImage(@image, 0, 0, @width, @height, 0, 0, @width, @height)
       ctx.restore()
+
+    toString: ->
+      'asteroid'
 
   loadImage = (url, width, height) ->
     new Promise((resolve, reject) ->
@@ -181,18 +194,13 @@ $(->
     cw = parseInt(canvas.attr('width'))
     ch = parseInt(canvas.attr('height'))
 
-    # Set initial state to menu (press space to start)
-    state = 'menu'
-
-    # Setup some useful variables in the menu state
-    ship = new Ship(canvas.attr('width') / 2, canvas.attr('height') / 2)
-    asteroids = [1..5].map((i) ->
-      new Asteroid(images[i % images.length],
-        Math.random() * 1000 % cw, Math.random() * 1000 % ch)
-    )
+    # Set initial state to setupMenu
+    state = 'setupMenu'
+    ship = null
+    asteroids = []
     entities = []
-    Array.prototype.push.apply(entities, asteroids)
-    # The text fades in
+
+    # The menu text fades in
     menuFont = "14pt 'Open Sans', sans-serif"
     menuTxt = 'Press space to start'
     ctx.font = menuFont
@@ -223,49 +231,69 @@ $(->
       # ctx.fillRect(0, 0, cw, ch)
       ctx.clearRect(0, 0, cw, ch)
 
+      # Drawn during menu state and playing state.
+      # Move+draw asteroids, reap entities and check
+      # for collision with ship
+      drawGame = ->
+        reapEntities = []
+        for entity in entities
+          if state is 'playing' and
+            entity.collidesWith(ship) and
+            String(entity) is 'asteroid' then state = 'setupMenu'
+          entity.draw(ctx)
+          entity.move(dt, cw, ch)
+          reapEntities.push(entity) if entity.reap()
+
+        # Remove bullets / other reaped entities
+        for entity in reapEntities
+          entities.splice(entities.indexOf(entity), 1)
+
+      # Drawn during the playing state.
+      drawShip = ->
+        ship.draw(ctx)
+        ship.move(dt, cw, ch)
+
+        # Fire the lazers
+        bullet = ship.fireBullet()
+        entities.push(bullet) if bullet?
+
       switch state
+        when 'setupMenu'
+          keys = []
+          asteroids = null
+          ship = null
+          asteroids = [1..5].map((i) ->
+            new Asteroid(images[i % images.length],
+              Math.random() * 1000 % cw, Math.random() * 1000 % ch)
+          )
+          entities = []
+          Array.prototype.push.apply(entities, asteroids)
+          state = 'menu'
+
         when 'menu'
           fadeTick += 0.0005 * dt if fadeTick < 1
           ctx.font = menuFont
           ctx.fillStyle = "rgba(200,200,200,#{fadeTick})"
           ctx.fillText(menuTxt, (cw - menuTxtMeasure.width) / 2, ch / 2)
+          drawGame()
           # Space
           if keys[32]
             keys[32] = false
-            state = 'leveldone'
+            state = 'setupPlaying'
 
-        # Setup the next level
-        when 'leveldone'
+        when 'setupPlaying'
           asteroids = [1..2].map((i) ->
             new Asteroid(images[i % images.length])
           )
-          entities = [ship]
+          entities = []
           Array.prototype.push.apply(entities, asteroids)
+          ship = new Ship(cw / 2, ch / 2)
           ship.setKeys(keys)
           state = 'playing'
 
-      shipCollision = false
-      for asteroid in asteroids
-        if asteroid.collidesWith(ship)
-          shipCollision = true
-          break
-
-      if shipCollision then ship.color = '#FF0000' else ship.color = '#FFFFFF'
-      # Draw the game, move the entities which
-      # are also drawn in the 'menu' state so I keep this
-      # logic in here instead of just 'playing' state
-      reapEntities = []
-      for entity in entities
-        entity.draw(ctx)
-        entity.move(dt, cw, ch)
-        reapEntities.push(entity) if entity.reap()
-
-      for entity in reapEntities
-        entities.splice(entities.indexOf(entity), 1)
-
-      # Fire the lazers
-      bullet = ship.fireBullet()
-      entities.push(bullet) if bullet?
+        when 'playing'
+          drawShip()
+          drawGame()
 
       frames = frames + 1
       # Let your browser decide when to run the loop again
