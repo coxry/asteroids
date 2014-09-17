@@ -112,10 +112,9 @@ $(->
     draw: (ctx) ->
       ctx.save()
       ctx.translate(@x,@y)
-      # # 2 for the lines on the spaceship
-      ctx.translate(@width / 2 + 2, @height / 2 + 2)
+      ctx.translate(@width / 2 + 2, @height / 2)
       ctx.rotate(@rotation)
-      ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
+      ctx.translate(-(@width / 2 + 2),-(@height / 2))
       ctx.drawImage(@image, 0, 0)
       ctx.restore()
       # ctx.strokeStyle = '#00FF00'
@@ -149,9 +148,9 @@ $(->
     draw: (ctx) ->
       ctx.save()
       ctx.translate(@x,@y)
-      ctx.translate(@width / 2 + 2, @height / 2 + 2)
+      ctx.translate(@width / 2 + 2, @height / 2)
       ctx.rotate(@rotation)
-      ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
+      ctx.translate(-(@width / 2 + 2),-(@height / 2))
       ctx.drawImage(@image, 0, 0, @width, @height, 0, 0, @width, @height)
       ctx.restore()
       # ctx.strokeStyle = '#FF0000'
@@ -184,7 +183,7 @@ $(->
   canvas = $('#gameScreen').first()
   ctx = canvas[0].getContext('2d')
 
-  shipWidth = 21
+  shipWidth = 22
   shipHeight = 22
 
   # Load all of our images in a promise array.
