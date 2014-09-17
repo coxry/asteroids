@@ -53,12 +53,10 @@ $(->
 
   class Ship extends Entity
     # Width & height used for drawing
-    width: 8
-    height: 16
     # Colllision box width & height
     cWidth: 15
     cHeight: 10
-    cOffX: -4
+    cOffX: 0
     cOffY: 0
     speed: 0.012
     bulletSpeed: 0.4
@@ -69,10 +67,13 @@ $(->
     rotationSpeed: 0.0085
     keys: []
 
-    constructor: (x, y) ->
+    constructor: (image, x, y, width, height) ->
+      @image = image
       @fireTick = @fireWait
       @x = x
       @y = y
+      @width = width
+      @height = height
 
     setKeys: (keys) ->
       @keys = keys
@@ -103,29 +104,23 @@ $(->
         @fireTick = 0
         xr = Math.cos(@rotation)
         yr = Math.sin(@rotation)
-        new Bullet(@x - (@width + 2) * xr + @width / 2,
-          @y - @height / 2 * yr + @height / 2,
-          @velX + -xr * @bulletSpeed, @velY + -yr * @bulletSpeed)
+        new Bullet(@x - @width * xr + @width / 2,
+          @y - @height * yr + @height / 2,
+          @velX + -xr * @bulletSpeed,
+          @velY + -yr * @bulletSpeed)
 
     draw: (ctx) ->
       ctx.save()
       ctx.translate(@x,@y)
-      # 2 for the lines on the spaceship
-      ctx.translate(2, @height / 2)
+      # # 2 for the lines on the spaceship
+      ctx.translate(@width / 2 + 2, @height / 2 + 2)
       ctx.rotate(@rotation)
-      ctx.translate(-2, -(@height / 2))
-      ctx.beginPath()
-      ctx.moveTo(@width, @height)
-      ctx.lineTo(-@width, @height / 2)
-      ctx.lineTo(@width, 0)
-      ctx.closePath()
-      ctx.strokeStyle = @color
-      ctx.lineWidth = 1
-      ctx.stroke()
+      ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
+      ctx.drawImage(@image, 0, 0)
       ctx.restore()
-      ctx.strokeStyle = '#00FF00'
-      ctx.strokeRect(@x + (@width - @cWidth) / 2 + @cOffX,
-        @y + (@height - @cHeight) / 2 + @cOffY, @cWidth, @cHeight)
+      # ctx.strokeStyle = '#00FF00'
+      # ctx.strokeRect(@x + (@width - @cWidth) / 2 + @cOffX,
+        # @y + (@height - @cHeight) / 2 + @cOffY, @cWidth, @cHeight)
 
     toString: ->
       'ship'
@@ -159,9 +154,9 @@ $(->
       ctx.translate(-(@width / 2 + 2),-(@height / 2 + 2))
       ctx.drawImage(@image, 0, 0, @width, @height, 0, 0, @width, @height)
       ctx.restore()
-      ctx.strokeStyle = '#FF0000'
-      ctx.strokeRect(@x + (@width - @cWidth) / 2 + 2,
-        @y + (@height - @cHeight) / 2 + 2, @cWidth, @cHeight)
+      # ctx.strokeStyle = '#FF0000'
+      # ctx.strokeRect(@x + (@width - @cWidth) / 2 + 2,
+        # @y + (@height - @cHeight) / 2 + 2, @cWidth, @cHeight)
 
     toString: ->
       'asteroid'
@@ -186,14 +181,17 @@ $(->
         image.onload = null
         image.onerror = null
     )
-
   canvas = $('#gameScreen').first()
   ctx = canvas[0].getContext('2d')
+
+  shipWidth = 21
+  shipHeight = 22
 
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
-    loadImage('./images/asteroid.png', 128, 128)
+    loadImage('./images/asteroid.png', 128, 128),
+    loadImage('./images/ship.png', shipWidth, shipHeight)
   ]).then((images) ->
 
     # Variables for handing FPS and dt
@@ -274,7 +272,7 @@ $(->
           asteroids = null
           ship = null
           asteroids = [1..5].map((i) ->
-            new Asteroid(images[i % images.length],
+            new Asteroid(images[0],
               Math.random() * 1000 % cw, Math.random() * 1000 % ch)
           )
           entities = []
@@ -293,12 +291,12 @@ $(->
             state = 'setupPlaying'
 
         when 'setupPlaying'
-          asteroids = [1..1].map((i) ->
-            new Asteroid(images[i % images.length])
+          asteroids = [1..2].map((i) ->
+            new Asteroid(images[0])
           )
           entities = []
           Array.prototype.push.apply(entities, asteroids)
-          ship = new Ship(cw / 2, ch / 2)
+          ship = new Ship(images[1], cw / 2, ch / 2, shipWidth, shipHeight)
           ship.setKeys(keys)
           state = 'playing'
 
