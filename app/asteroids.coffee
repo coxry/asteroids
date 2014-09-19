@@ -1,27 +1,8 @@
 `import Ship from 'asteroids/ship'`
 `import Asteroid from 'asteroids/asteroid'`
+`import Utils from 'asteroids/utils'`
 
 (->
-  loadImage = (url, width, height) ->
-    new Promise((resolve, reject) ->
-      image = new Image()
-      image.src = url
-      image.width = width
-      image.height = height
-      image.onload = ->
-        imageCanvas = document.createElement('canvas')
-        imageCanvas.width = width
-        imageCanvas.height = height
-        imageCanvas.getContext('2d').drawImage(image, 0, 0)
-        cleanup()
-        resolve(imageCanvas)
-      image.onerror = (err) ->
-        cleanup()
-        reject(Error("Unable to load #{url}"))
-      cleanup = ->
-        image.onload = null
-        image.onerror = null
-    )
   canvas = $('#gameScreen').first()
   ctx = canvas[0].getContext('2d')
 
@@ -31,8 +12,8 @@
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
-    loadImage('./images/asteroid.png', 128, 128),
-    loadImage('./images/ship.png', shipWidth, shipHeight)
+    Utils.loadImage('./images/asteroid.png', 128, 128),
+    Utils.loadImage('./images/ship.png', shipWidth, shipHeight)
   ]).then((images) ->
 
     # Variables for handing FPS and dt
