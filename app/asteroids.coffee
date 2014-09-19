@@ -1,29 +1,22 @@
 `import Ship from 'asteroids/ship'`
 `import Asteroid from 'asteroids/asteroid'`
 `import Utils from 'asteroids/utils'`
+`import FpsCounter from 'asteroids/fps-counter'`
 
 (->
   canvas = $('#gameScreen').first()
   ctx = canvas[0].getContext('2d')
 
-  shipWidth = 22
-  shipHeight = 22
+  # Canvas width and height
+  cw = parseInt(canvas.attr('width'))
+  ch = parseInt(canvas.attr('height'))
 
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
   Promise.all([
     Utils.loadImage('./images/asteroid.png', 128, 128),
-    Utils.loadImage('./images/ship.png', shipWidth, shipHeight)
+    Utils.loadImage('./images/ship.png', 22, 22)
   ]).then((images) ->
-
-    # Variables for handing FPS and dt
-    frames = 0
-    time = null
-    oldTime = new Date().getTime()
-
-    # Canvas width and height
-    cw = parseInt(canvas.attr('width'))
-    ch = parseInt(canvas.attr('height'))
 
     # Set initial state to setupMenu
     state = 'setupMenu'
@@ -42,24 +35,23 @@
     keys = []
     window.onkeydown = (event) ->
       keys[event.keyCode] = true
+      return
     window.onkeyup = (event) ->
       keys[event.keyCode] = false
+      return
+
+    # Count FPS in our game loop
+    fpsCounter = new FpsCounter()
 
     # Game loop!
     gameLoop = (->
-      now = new Date().getTime()
-      dt = now - (time or now)
-      time = now
+      fpsCounter.tick()
 
-      # Log FPS every second
-      if time - oldTime > 1000
-        oldTime = time
-        console.debug(frames)
-        frames = 0
+      # Calculate delay between frames
+      dt = fpsCounter.dt
 
       # Clear the screen
       ctx.fillStyle = '#000000'
-      # ctx.fillRect(0, 0, cw, ch)
       ctx.clearRect(0, 0, cw, ch)
 
       # Drawn during menu state and playing state.
@@ -118,7 +110,7 @@
           )
           entities = []
           Array.prototype.push.apply(entities, asteroids)
-          ship = new Ship(images[1], cw / 2, ch / 2, shipWidth, shipHeight)
+          ship = new Ship(images[1], cw / 2, ch / 2)
           ship.setKeys(keys)
           state = 'playing'
 
@@ -126,7 +118,6 @@
           drawShip()
           drawGame()
 
-      frames = frames + 1
       # Let your browser decide when to run the loop again
       window.requestAnimationFrame(gameLoop)
     )

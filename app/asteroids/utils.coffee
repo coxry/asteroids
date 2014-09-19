@@ -3,8 +3,8 @@ class Utils
     new Promise((resolve, reject) ->
       image = new Image()
       image.src = url
-      image.width = width
-      image.height = height
+      image.width = width if width?
+      image.height = height if height?
       image.onload = ->
         imageCanvas = document.createElement('canvas')
         imageCanvas.width = width

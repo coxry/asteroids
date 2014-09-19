@@ -17,13 +17,13 @@ class Ship extends GameEntity
   rotationSpeed: 0.0085
   keys: []
 
-  constructor: (image, x, y, width, height) ->
+  constructor: (image, x, y) ->
     @image = image
     @fireTick = @fireWait
     @x = x
     @y = y
-    @width = width
-    @height = height
+    @width = image.width
+    @height = image.height
 
   setKeys: (keys) ->
     @keys = keys
