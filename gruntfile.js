@@ -65,8 +65,6 @@ module.exports = function(grunt) {
       amd: {
         src: ["vendor/rAF.js",
               "bower_components/es6-promise/promise.js",
-              "bower_components/jquery/dist/jquery.js",
-              "bower_comonents/bootstrap/dist/js/bootstrap.js",
               "tmp/**/*.amd.js"],
         dest: "dist/asteroids.amd.js"
       },
