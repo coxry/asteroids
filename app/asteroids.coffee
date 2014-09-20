@@ -4,12 +4,32 @@
 `import FpsCounter from 'asteroids/fps-counter'`
 
 (->
-  canvas = $('#gameScreen').first()
-  ctx = canvas[0].getContext('2d')
+  # Setup some important variables
+  canvas     = $('#gameScreen').first()
+  ctx        = canvas[0].getContext('2d')
+  cw         = parseInt(canvas.attr('width'))
+  ch         = parseInt(canvas.attr('height'))
+  ship       = null
+  asteroids  = []
+  entities   = []
+  fpsCounter = new FpsCounter()
 
-  # Canvas width and height
-  cw = parseInt(canvas.attr('width'))
-  ch = parseInt(canvas.attr('height'))
+  # The menu text fades in
+  menuFont       = "14pt 'Open Sans', sans-serif"
+  menuTxt        = 'Press space to start'
+  ctx.font       = menuFont
+  menuTxtMeasure = ctx.measureText(menuTxt)
+  fadeTick       = 0
+  state          = 'setupMenu'
+
+  # Keyboard handling
+  keys = []
+  window.onkeydown = (event) ->
+    keys[event.keyCode] = true
+    return
+  window.onkeyup = (event) ->
+    keys[event.keyCode] = false
+    return
 
   # Load all of our images in a promise array.
   # Each image is a resolved promise.
@@ -17,31 +37,6 @@
     Utils.loadImage('./images/asteroid.png', 128, 128),
     Utils.loadImage('./images/ship.png', 22, 22)
   ]).then((images) ->
-
-    # Set initial state to setupMenu
-    state = 'setupMenu'
-    ship = null
-    asteroids = []
-    entities = []
-
-    # The menu text fades in
-    menuFont = "14pt 'Open Sans', sans-serif"
-    menuTxt = 'Press space to start'
-    ctx.font = menuFont
-    menuTxtMeasure = ctx.measureText(menuTxt)
-    fadeTick = 0
-
-    # Keyboard handling
-    keys = []
-    window.onkeydown = (event) ->
-      keys[event.keyCode] = true
-      return
-    window.onkeyup = (event) ->
-      keys[event.keyCode] = false
-      return
-
-    # Count FPS in our game loop
-    fpsCounter = new FpsCounter()
 
     # Game loop!
     gameLoop = (->

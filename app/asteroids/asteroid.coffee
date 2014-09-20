@@ -1,20 +1,20 @@
 `import GameEntity from 'asteroids/game-entity'`
 
 class Asteroid extends GameEntity
-  cWidth: 100
-  cHeight: 100
-  cOffX: 2
-  cOffY: 2
+  cWidth  : 100
+  cHeight : 100
+  cOffX   : 2
+  cOffY   : 2
 
   constructor: (image, x, y)  ->
-    @image = image
-    @width = image.width
-    @height = image.height
-    @velX = Math.random() / 4 - Math.random() / 4
-    @velY = Math.random() / 4 - Math.random() / 4
-    @x = x or 0
-    @y = y or 0
-    @rotation = Math.random()
+    @image         = image
+    @width         = image.width
+    @height        = image.height
+    @velX          = Math.random() / 4 - Math.random() / 4
+    @velY          = Math.random() / 4 - Math.random() / 4
+    @x             = x or 0
+    @y             = y or 0
+    @rotation      = Math.random()
     @rotationSpeed = Math.random() / 800  - Math.random() / 800
 
   move: (dt, maxWidth, maxHeight) ->

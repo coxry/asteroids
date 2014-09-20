@@ -1,17 +1,15 @@
 `import GameEntity from 'asteroids/game-entity'`
 
 class Bullet extends GameEntity
-  # Width & height used for drawing
-  width: 4
-  height: 4
-  # Colllision box width & height
-  cWidth: 4
-  cHeight: 4
-  ticksTillReap: 500
+  width         : 4
+  height        : 4
+  cWidth        : 4
+  cHeight       : 4
+  ticksTillReap : 500
 
   constructor: (x, y, velX, velY) ->
-    @x = x - @width / 2
-    @y = y - @height / 2
+    @x    = x - @width / 2
+    @y    = y - @height / 2
     @velX = velX
     @velY = velY
 

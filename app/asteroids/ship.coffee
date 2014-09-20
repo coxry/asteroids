@@ -2,28 +2,26 @@
 `import Bullet from 'asteroids/bullet'`
 
 class Ship extends GameEntity
-  # Width & height used for drawing
-  # Colllision box width & height
-  cWidth: 15
-  cHeight: 10
-  cOffX: 0
-  cOffY: 0
-  speed: 0.012
-  bulletSpeed: 0.4
-  rotation: 0
-  maxSpeed: 1
-  fireWait: 25
-  color: '#FFFFFF'
-  rotationSpeed: 0.0085
-  keys: []
+  cWidth        : 15
+  cHeight       : 10
+  cOffX         : 0
+  cOffY         : 0
+  speed         : 0.012
+  bulletSpeed   : 0.4
+  rotation      : 0
+  maxSpeed      : 1
+  fireWait      : 25
+  color         : '#FFFFFF'
+  rotationSpeed : 0.0085
+  keys          : []
 
   constructor: (image, x, y) ->
-    @image = image
+    @image    = image
     @fireTick = @fireWait
-    @x = x
-    @y = y
-    @width = image.width
-    @height = image.height
+    @x        = x
+    @y        = y
+    @width    = image.width
+    @height   = image.height
 
   setKeys: (keys) ->
     @keys = keys
@@ -33,9 +31,9 @@ class Ship extends GameEntity
     if @keys[38]
       x = @velX - Math.cos(@rotation) * @speed
       y = @velY - Math.sin(@rotation) * @speed
+      v = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
       @velX = x
       @velY = y
-      v = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
       if v > @maxSpeed
         scale = @maxSpeed / v
         @velX *= scale
