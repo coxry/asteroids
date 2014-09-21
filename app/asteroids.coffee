@@ -49,23 +49,6 @@
       ctx.fillStyle = '#000000'
       ctx.clearRect(0, 0, cw, ch)
 
-      # Drawn during menu state and playing state.
-      # Move+draw asteroids, reap entities and check
-      # for collision with ship
-      drawGame = ->
-        reapEntities = []
-        for entity in entities
-          if state is 'playing' and
-            entity.collidesWith(ship) and
-            String(entity) is 'asteroid' then state = 'setupMenu'
-          entity.draw(ctx)
-          entity.move(dt, cw, ch)
-          reapEntities.push(entity) if entity.reap()
-
-        # Remove bullets / other reaped entities
-        for entity in reapEntities
-          entities.splice(entities.indexOf(entity), 1)
-
       # Drawn during the playing state.
       drawShip = ->
         ship.draw(ctx)
@@ -93,7 +76,11 @@
           ctx.font = menuFont
           ctx.fillStyle = "rgba(200,200,200,#{fadeTick})"
           ctx.fillText(menuTxt, (cw - menuTxtMeasure.width) / 2, ch / 2)
-          drawGame()
+          for entity in entities
+            entity.draw(ctx)
+            entity.move(dt, cw, ch)
+            reapEntities.push(entity) if entity.reap()
+
           # Space
           if keys[32]
             keys[32] = false
@@ -111,7 +98,17 @@
 
         when 'playing'
           drawShip()
-          drawGame()
+          reapEntities = []
+          for entity in entities
+            if entity.collidesWith(ship) and
+              String(entity) is 'asteroid' then state = 'setupMenu'
+            entity.draw(ctx)
+            entity.move(dt, cw, ch)
+            reapEntities.push(entity) if entity.reap()
+
+          # Remove bullets / other reaped entities
+          for entity in reapEntities
+            entities.splice(entities.indexOf(entity), 1)
 
       # Let your browser decide when to run the loop again
       window.requestAnimationFrame(gameLoop)
