@@ -18,11 +18,6 @@ class GameState extends State
   render: ->
     super
     @ship.draw(@ctx)
-    @ship.move(@fpsCounter.dt, @cw, @ch)
-
-    # Fire the lazers
-    bullet = @ship.fireBullet()
-    @entities.push(bullet) if bullet?
     reapEntities = []
 
     # Draw the game
@@ -38,6 +33,10 @@ class GameState extends State
       @entities.splice(@entities.indexOf(entity), 1)
 
   handleInput: (keys) ->
-    @ship.setKeys(keys)
+    @ship.move(@fpsCounter.dt, @cw, @ch, keys)
+
+    # Fire the lazers
+    bullet = @ship.fireBullet(keys)
+    @entities.push(bullet) if bullet?
 
 `export default GameState`

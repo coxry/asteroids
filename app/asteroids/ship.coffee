@@ -13,7 +13,6 @@ class Ship extends GameEntity
   fireWait      : 25
   color         : '#FFFFFF'
   rotationSpeed : 0.0085
-  keys          : []
 
   constructor: (image, x, y) ->
     @image    = image
@@ -23,12 +22,9 @@ class Ship extends GameEntity
     @width    = image.width
     @height   = image.height
 
-  setKeys: (keys) ->
-    @keys = keys
-
-  move: (dt, maxWidth, maxHeight) ->
+  move: (dt, maxWidth, maxHeight, keys) ->
     # Up
-    if @keys[38]
+    if keys[38]
       x = @velX - Math.cos(@rotation) * @speed
       y = @velY - Math.sin(@rotation) * @speed
       v = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
@@ -39,16 +35,16 @@ class Ship extends GameEntity
         @velX *= scale
         @velY *= scale
     # Left
-    if @keys[37] then @rotation -= @rotationSpeed * dt
+    if keys[37] then @rotation -= @rotationSpeed * dt
     # Right
-    if @keys[39] then @rotation += @rotationSpeed * dt
+    if keys[39] then @rotation += @rotationSpeed * dt
     super(dt, maxWidth, maxHeight)
 
-  fireBullet: ->
+  fireBullet: (keys) ->
     # Wait until you can fire
     @fireTick = @fireTick + 1
     # Space
-    if @keys[32] and @fireTick >= @fireWait
+    if keys[32] and @fireTick >= @fireWait
       @fireTick = 0
       xr = Math.cos(@rotation)
       yr = Math.sin(@rotation)
