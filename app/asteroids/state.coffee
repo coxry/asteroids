@@ -3,12 +3,13 @@
 class State
   transition: null
 
-  constructor: ->
+  constructor: (transition) ->
     @canvas     = $('#gameScreen').first()
     @ctx        = @canvas[0].getContext('2d')
     @cw         = parseInt(@canvas.attr('width'))
     @ch         = parseInt(@canvas.attr('height'))
     @fpsCounter = new FpsCounter()
+    @transition = transition
 
   setup: ->
 

@@ -1,4 +1,5 @@
 `import StateMachine from 'asteroids/state-machine'`
+`import State from 'asteroids/state'`
 
 (->
   # Keyboard handling
@@ -10,23 +11,25 @@
     keys[event.keyCode] = false
     return
 
-  StateMachine.transitionTo('menu').then((state) ->
-    gameLoop = (->
+  # Set the initial state
+  state = new State('menu')
+
+  gameLoop = (->
+    # Handle state transitions
+    if state.transition?
+      console.debug("Transitioning to #{state.transition}")
+      StateMachine.transitionTo(state.transition).then((newState) ->
+        state = newState
+        window.requestAnimationFrame(gameLoop)
+      # If there was an error transitioning
+      ,(err) ->
+        console.error(err)
+      )
+    # Render the current state
+    else
       state.render()
       state.handleInput(keys)
-
-      # If there needs to be a transition then transition
-      if state.transition?
-        console.debug("Transitioning to #{state.transition}")
-        StateMachine.transitionTo(state.transition).then((newState) ->
-          state = newState
-          window.requestAnimationFrame(gameLoop)
-        )
-      else
-        window.requestAnimationFrame(gameLoop)
-    )
-    gameLoop()
-  ,(err) ->
-    console.error(err)
+      window.requestAnimationFrame(gameLoop)
   )
+  gameLoop()
 )()
