@@ -1,8 +1,10 @@
 class GameEntity
-  velX : 0
-  velY : 0
-  x    : 0
-  y    : 0
+  velX  : 0
+  velY  : 0
+  x     : 0
+  y     : 0
+  cOffX : 0
+  cOffY : 0
 
   move: (dt, maxWidth, maxHeight) ->
     @x += @velX * dt

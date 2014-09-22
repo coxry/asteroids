@@ -6,6 +6,9 @@
 class GameState extends State
   setup: ->
     super
+    @entities = []
+    @bullets = []
+
     Promise.all([
       Utils.loadImage('./images/asteroid.png', 128, 128),
       Utils.loadImage('./images/ship.png', 22, 22)
@@ -16,7 +19,6 @@ class GameState extends State
           Math.random() * 1000 % @ch
         )
       )
-      @entities = []
       Array.prototype.push.apply(@entities, @asteroids)
       @ship = new Ship(images[1], @cw / 2, @ch / 2)
     )
@@ -30,12 +32,21 @@ class GameState extends State
     for entity in @entities
       entity.draw(@ctx)
       entity.move(@fpsCounter.dt, @cw, @ch)
-      if entity.collidesWith(@ship) and
-        String(entity) is 'asteroid' then @transition = 'menu'
+
+      if String(entity) is 'asteroid'
+        if entity.collidesWith(@ship)
+          @transition = 'menu'
+          break
+        else
+          for bullet in @bullets
+            if entity.collidesWith(bullet)
+              console.debug('COLLIDE')
+
       reapEntities.push(entity) if entity.reap()
 
     # Remove bullets / other reaped entities
     for entity in reapEntities
+      @bullets.splice(@bullets.indexOf(entity)) if String(entity) is 'bullet'
       @entities.splice(@entities.indexOf(entity), 1)
 
   handleInput: (keys) ->
@@ -43,6 +54,8 @@ class GameState extends State
 
     # Fire the lazers
     bullet = @ship.fireBullet(keys)
-    @entities.push(bullet) if bullet?
+    if bullet?
+      @bullets.push(bullet)
+      @entities.push(bullet)
 
 `export default GameState`
