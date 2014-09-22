@@ -3,14 +3,12 @@
 class State
   transition: null
 
-  constructor: (canvas, images) ->
-    @canvas = canvas
-    @images = images
-    @ctx    = @canvas[0].getContext('2d')
-    @cw     = parseInt(@canvas.attr('width'))
-    @ch     = parseInt(@canvas.attr('height'))
+  constructor: ->
+    @canvas     = $('#gameScreen').first()
+    @ctx        = @canvas[0].getContext('2d')
+    @cw         = parseInt(@canvas.attr('width'))
+    @ch         = parseInt(@canvas.attr('height'))
     @fpsCounter = new FpsCounter()
-    @setup()
 
   setup: ->
 

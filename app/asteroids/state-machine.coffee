@@ -2,12 +2,22 @@
 `import GameState from 'asteroids/game-state'`
 
 class StateMachine
-  @transitionTo: (state, canvas, images) ->
+  @transitionTo: (state) ->
     switch state
       when 'menu'
-        return new MenuState(canvas, images)
+        stateClass = MenuState
       when 'game'
-        return new GameState(canvas, images)
+        stateClass = GameState
+
+    state = new stateClass()
+
+    new Promise((resolve, reject) ->
+      state.setup().then((images) ->
+        resolve(state)
+      ,(err) ->
+        reject(err)
+      )
+    )
 
 `export default StateMachine`
 

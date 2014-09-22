@@ -1,5 +1,6 @@
 `import State from 'asteroids/state'`
 `import Asteroid from 'asteroids/asteroid'`
+`import Utils from 'asteroids/utils'`
 
 class MenuState extends State
   setup: ->
@@ -10,10 +11,15 @@ class MenuState extends State
     @menuTxt   = 'Press space to start'
     @ctx.font = @menuFont
     @menuTxtMeasure = @ctx.measureText(@menuTxt)
-    @asteroids = [1..5].map((i) =>
-      new Asteroid(@images[0],
-        Math.random() * 1000 % @cw,
-        Math.random() * 1000 % @ch)
+
+    Promise.all([
+      Utils.loadImage('./images/asteroid.png', 128, 128)
+    ]).then((images) =>
+      @asteroids = [1..5].map((i) =>
+        new Asteroid(images[0],
+          Math.random() * 1000 % @cw,
+          Math.random() * 1000 % @ch)
+      )
     )
 
   render: ->

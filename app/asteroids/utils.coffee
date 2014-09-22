@@ -1,15 +1,21 @@
 class Utils
-  @loadImage: (url, width, height) ->
-    new Promise((resolve, reject) ->
+  @cache = {}
+
+  @loadImage: (url, width, height) =>
+    new Promise((resolve, reject) =>
+      if @cache[url]
+        resolve(@cache[url])
+        return
       image = new Image()
       image.src = url
       image.width = width if width?
       image.height = height if height?
-      image.onload = ->
+      image.onload = =>
         imageCanvas = document.createElement('canvas')
         imageCanvas.width = width
         imageCanvas.height = height
         imageCanvas.getContext('2d').drawImage(image, 0, 0)
+        @cache[url] = imageCanvas
         cleanup()
         resolve(imageCanvas)
       image.onerror = (err) ->
