@@ -4,8 +4,6 @@
 class Ship extends GameEntity
   cWidth        : 15
   cHeight       : 10
-  cOffX         : 0
-  cOffY         : 0
   speed         : 0.012
   bulletSpeed   : 0.4
   rotation      : 0

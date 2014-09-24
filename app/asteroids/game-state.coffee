@@ -13,11 +13,8 @@ class GameState extends State
       Utils.loadImage('./images/asteroid.png', 128, 128),
       Utils.loadImage('./images/ship.png', 22, 22)
     ]).then((images) =>
-      @asteroids = [1..2].map((i) =>
-        new Asteroid(images[0],
-          Math.random() * 1000 % @cw,
-          Math.random() * 1000 % @ch
-        )
+      @asteroids = [1..10].map((i) =>
+        new Asteroid(images[0])
       )
       Array.prototype.push.apply(@entities, @asteroids)
       @ship = new Ship(images[1], @cw / 2, @ch / 2)
@@ -40,6 +37,8 @@ class GameState extends State
         else
           for bullet in @bullets
             if entity.collidesWith(bullet)
+              reapEntities.push(entity)
+              reapEntities.push(bullet)
               console.debug('COLLIDE')
 
       reapEntities.push(entity) if entity.reap()

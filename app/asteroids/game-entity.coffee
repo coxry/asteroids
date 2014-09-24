@@ -3,8 +3,6 @@ class GameEntity
   velY  : 0
   x     : 0
   y     : 0
-  cOffX : 0
-  cOffY : 0
 
   move: (dt, maxWidth, maxHeight) ->
     @x += @velX * dt
@@ -15,10 +13,10 @@ class GameEntity
     if @y < -@height then @y = maxHeight
 
   collidesWith: (e) ->
-    @x + (@width - @cWidth) / 2 < e.x + e.cWidth + (e.width - e.cWidth) / 2 + e.cOffX and
-      @x + @cWidth + (@width - @cWidth) / 2 + @cOffX > e.x + (e.width - e.cWidth) / 2 + e.cOffX and
-      @y + (@height - @cHeight) / 2 < e.y + e.cHeight + (e.height - e.cHeight) / 2 + e.cOffY and
-      @y + @cHeight + (@height - @cHeight) / 2 + @cOffY > e.y + (e.height - e.cHeight) / 2 + e.cOffY
+    @x + (@width - @cWidth) / 2 < e.x + e.cWidth + (e.width - e.cWidth) / 2 and
+      @x + @cWidth + (@width - @cWidth) / 2 > e.x + (e.width - e.cWidth) / 2 and
+      @y + (@height - @cHeight) / 2 < e.y + e.cHeight + (e.height - e.cHeight) / 2 and
+      @y + @cHeight + (@height - @cHeight) / 2 > e.y + (e.height - e.cHeight) / 2
 
   reap: ->
     false

@@ -3,8 +3,8 @@
 class Bullet extends GameEntity
   width         : 4
   height        : 4
-  cWidth        : 4
-  cHeight       : 4
+  cWidth        : 7
+  cHeight       : 7
   ticksTillReap : 500
 
   constructor: (x, y, velX, velY) ->

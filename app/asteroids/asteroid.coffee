@@ -3,8 +3,6 @@
 class Asteroid extends GameEntity
   cWidth  : 100
   cHeight : 100
-  cOffX   : 2
-  cOffY   : 2
 
   constructor: (image, x, y)  ->
     @image         = image
