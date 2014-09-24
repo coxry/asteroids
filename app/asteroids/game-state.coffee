@@ -45,7 +45,7 @@ class GameState extends State
 
     # Remove bullets / other reaped entities
     for entity in reapEntities
-      @bullets.splice(@bullets.indexOf(entity)) if String(entity) is 'bullet'
+      @bullets.splice(@bullets.indexOf(entity), 1) if String(entity) is 'bullet'
       @entities.splice(@entities.indexOf(entity), 1)
 
   handleInput: (keys) ->
