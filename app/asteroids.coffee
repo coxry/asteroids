@@ -4,12 +4,14 @@
 (->
   # Keyboard handling
   keys = []
-  window.onkeydown = (event) ->
-    keys[event.keyCode] = true
-    return
-  window.onkeyup = (event) ->
-    keys[event.keyCode] = false
-    return
+  $(document).keydown((event) ->
+    keys[event.which] = true
+    event.preventDefault()
+  )
+  $(document).keyup((event) ->
+    keys[event.which] = false
+    event.preventDefault()
+  )
 
   # Set the initial state
   state = new State('menu')
